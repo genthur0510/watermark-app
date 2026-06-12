@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TA Studio - Watermark & Split Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <div class="container layout-split">
+    <div class="control-panel">
+      <div class="header-section">
+        <h2 class="header-title">TA Studio.</h2>
+        <p class="header-subtitle">Watermark, Split & Clean engine. 100% Privacy Secure.</p>
+      </div>
+
+      <div class="card bento-card">
+        <h3>1. Berkas Utama</h3>
+        <div class="form-group">
+          <label>Dokumen PDF Tugas Akhir</label>
+          <input type="file" id="pdf-file" accept="application/pdf" />
+        </div>
+        <div class="form-group">
+          <label>Gambar Watermark (PNG/JPG)</label>
+          <input type="file" id="watermark-image" accept="image/png, image/jpeg" />
+        </div>
+      </div>
+
+      <div class="card bento-card">
+        <h3>2. Pengaturan Visual</h3>
+        <div class="form-group">
+          <label>Opacity: <span id="opacity-val" class="accent-text">50%</span></label>
+          <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.5" />
+        </div>
+        <div class="form-group">
+          <label>Ukuran: <span id="size-val" class="accent-text">100%</span></label>
+          <input type="range" id="size" min="0.1" max="3" step="0.1" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Posisi Horizontal:</label>
+          <select id="position">
+            <option value="left" selected>Rapat Kiri</option>
+            <option value="center">Tengah Halaman</option>
+            <option value="right">Rapat Kanan</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card bento-card">
+        <h3>3. Hapus Halaman Kosong</h3>
+        <div class="form-group">
+          <label>Nomor Halaman yang Dihapus (Opsional)</label>
+          <input type="text" id="pages-to-delete" placeholder="Misal: 2, 8, 12-14 (Kosongkan jika tak ada)" />
+          <p class="helper-text">
+            *Gunakan nomor urut PDF asli. Halaman akan dibuang permanen sebelum dokumen dipotong.
+          </p>
+        </div>
+      </div>
+
+      <div class="card bento-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="margin: 0;">4. Pemotongan & Penamaan</h3>
+          <span id="page-count-info" style="display: none; background: rgba(16, 185, 129, 0.1); color: #34d399; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">
+            Total Hal: ?
+          </span>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col" style="flex: 0.7;">
+            <label>Hal. Cover</label>
+            <input type="text" id="range-cover" value="1-" placeholder="1" />
+          </div>
+          <div class="form-group col" style="flex: 1.3;">
+            <label>Nama File</label>
+            <input type="text" id="name-cover" value="Cover_nim_nama" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col" style="flex: 0.7;">
+            <label>Hal. Full Text</label>
+            <input type="text" id="range-full" value="1-" placeholder="2-50" />
+          </div>
+          <div class="form-group col" style="flex: 1.3;">
+            <label>Nama File</label>
+            <input type="text" id="name-fulltext" value="Fulltext_nim_nama" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col" style="flex: 0.7;">
+            <label>Hal. Lampiran</label>
+            <input type="text" id="range-lampiran" value="11-end" placeholder="51-end" />
+          </div>
+          <div class="form-group col" style="flex: 1.3;">
+            <label>Nama File</label>
+            <input type="text" id="name-lampiran" value="Lampiran_nim_nama" />
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="preview-btn" class="btn-primary">Terapkan Preview</button>
+          <button id="split-btn" class="btn-glow" style="display: none;">Potong Dokumen</button>
+        </div>
+        <p id="status-msg" class="status"></p>
+
+        <div id="download-zone" class="download-zone" style="display: none;">
+          <h4>📥 Unduh Hasil Dokumen</h4>
+          <button id="dl-full-doc" class="btn-outline">Unduh Dokumen Utuh (Watermarked)</button>
+          <div class="split-buttons">
+            <button id="dl-cover" class="btn-subtle">Cover</button>
+            <button id="dl-fulltext" class="btn-subtle">Full Text</button>
+            <button id="dl-lampiran" class="btn-subtle">Lampiran</button>
+          </div>
+          
+          <hr style="margin: 15px 0; border-color: rgba(255,255,255,0.05);">
+          <button id="reset-btn" class="btn-danger">🔄 Kerjakan Order Baru</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-panel">
+      <div class="card preview-card">
+        <div class="preview-header">
+          <div class="dot-group">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <span class="preview-title">Pratinjau Resolusi Tinggi</span>
+        </div>
+        <iframe id="pdf-preview" src="" frameborder="0"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
